@@ -7,6 +7,9 @@
 #include "sapi/tpm20.h"
 #include "sysapi_util.h"
 #include "tcti/tcti_socket.h"
+#include "test_utils/syscontext.h"
+
+TSS2_ABI_VERSION abiVersion = { TSSWG_INTEROP, TSS_SAPI_FIRST_FAMILY, TSS_SAPI_FIRST_LEVEL, TSS_SAPI_FIRST_VERSION };
 
 /**
  * Sends PlatformCommands to power cycle the TPM
@@ -44,7 +47,8 @@ Tss2_Sys_Startup_PowerCycle_unit (void **state)
 static void
 Tss2_Sys_Startup_Success_unit (void **state)
 {
-    TSS2_SYS_CONTEXT *sysContext;
+    TSS2_TCTI_CONTEXT *resMgrTctiContext = 0;
+    TSS2_SYS_CONTEXT *sysContext = InitSysContext( 0, resMgrTctiContext, &abiVersion );
     // First must do TPM reset.
     UINT32 rval = TpmReset();
     assert_int_equal(rval, TPM_RC_SUCCESS);
@@ -60,7 +64,8 @@ Tss2_Sys_Startup_Success_unit (void **state)
 static void
 Tss2_Sys_Startup_Fail_unit (void **state)
 {
-    TSS2_SYS_CONTEXT *sysContext;
+    TSS2_TCTI_CONTEXT *resMgrTctiContext = 0;
+    TSS2_SYS_CONTEXT *sysContext = InitSysContext( 0, resMgrTctiContext, &abiVersion );
     // First must do TPM reset.
     UINT32 rval = TpmReset();
     assert_int_equal(rval, TPM_RC_SUCCESS);
@@ -76,7 +81,8 @@ Tss2_Sys_Startup_Fail_unit (void **state)
 static void
 Tss2_Sys_Startup_Sync_unit (void **state)
 {
-    TSS2_SYS_CONTEXT *sysContext;
+    TSS2_TCTI_CONTEXT *resMgrTctiContext = 0;
+    TSS2_SYS_CONTEXT *sysContext = InitSysContext( 0, resMgrTctiContext, &abiVersion );
     // First must do TPM reset.
     UINT32 rval = TpmReset();
     assert_int_equal(rval, TPM_RC_SUCCESS);
@@ -96,7 +102,8 @@ Tss2_Sys_Startup_Sync_unit (void **state)
 static void
 Tss2_Sys_Startup_Async_unit (void **state)
 {
-    TSS2_SYS_CONTEXT *sysContext;
+    TSS2_TCTI_CONTEXT *resMgrTctiContext = 0;
+    TSS2_SYS_CONTEXT *sysContext = InitSysContext( 0, resMgrTctiContext, &abiVersion );
     // First must do TPM reset.
     UINT32 rval = TpmReset();
     assert_int_equal(rval, TPM_RC_SUCCESS);

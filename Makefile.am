@@ -137,7 +137,7 @@ test_unit_Tss2_Sys_Initialize_LDADD   = $(CMOCKA_LIBS) $(libsapi)
 test_unit_Tss2_Sys_Initialize_SOURCES = test/unit/Tss2_Sys_Initialize.c
 
 test_unit_Tss2_Sys_Startup_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
-test_unit_Tss2_Sys_Startup_LDADD   = $(CMOCKA_LIBS) $(libsapi) $(libtcti_socket) $(libtcti_device)
+test_unit_Tss2_Sys_Startup_LDADD   = $(CMOCKA_LIBS) $(libsapi) $(libtcti_socket) $(libtcti_device) $(libtest_utils)
 test_unit_Tss2_Sys_Startup_SOURCES = test/unit/Tss2_Sys_Startup.c
 
 test_unit_UINT8_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
