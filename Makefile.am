@@ -68,6 +68,7 @@ TESTS_INTEGRATION = \
     test/integration/self-test.int \
     test/integration/start-auth-session.int \
     test/integration/sys-initialize.int \
+    test/integration/sapi.int \
     test/tpmclient/tpmclient.int
 endif #SIMULATOR_BIN
 
@@ -217,6 +218,10 @@ test_integration_evict_ctrl_int_SOURCES = \
 
 test_integration_sys_initialize_int_LDADD   = $(TESTS_LDADD)
 test_integration_sys_initialize_int_SOURCES = test/integration/sys-initialize.int.c \
+    test/integration/main.c
+
+test_integration_sapi_int_LDADD   = $(TESTS_LDADD)
+test_integration_sapi_int_SOURCES = test/integration/sapi.int.c \
     test/integration/main.c
 
 test_integration_get_random_int_LDADD   = $(TESTS_LDADD)

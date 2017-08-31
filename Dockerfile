@@ -1,5 +1,8 @@
 FROM ubuntu:trusty
 
+ENV http_proxy=http://proxy.jf.intel.com:911/
+ENV https_proxy=http://proxy.jf.intel.com:912/
+
 RUN apt -y update && \
   apt -y install \
     autoconf-archive \
