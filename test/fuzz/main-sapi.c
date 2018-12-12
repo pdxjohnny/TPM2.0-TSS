@@ -33,6 +33,8 @@ LLVMFuzzerTestOneInput (
         LOG_ERROR("Checking test options");
         exit(1); /* fatal error */
     }
+    /* Use the fuzzing tcti */
+    opts.tcti_type = FUZZING_TCTI;
     sapi_context = sapi_init_from_opts (&opts);
     if (sapi_context == NULL) {
         LOG_ERROR("SAPI context not initialized");
