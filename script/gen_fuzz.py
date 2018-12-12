@@ -131,7 +131,7 @@ def gen_prepare(function, function_name, args):
         arg.replace('*', '&').split()[-1] for arg in args])
     fill_fuzz_args = (',\n' + ' ' * 8).join([
         ('sizeof (%s), &%s' % \
-                (arg.split()[-2], arg.replace('*', '').split()[-1])) \
+                tuple([arg.replace('*', '').split()[-1]] * 2)) \
         for arg in args])
     return function_name, SYS_PREPARE_TEMPLATE_HAS_ARGS % (arg_definitions,
                                                            len(args) * 2,
