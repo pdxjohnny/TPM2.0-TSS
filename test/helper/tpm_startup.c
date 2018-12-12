@@ -14,20 +14,17 @@ main (int argc, char *argv[])
     TSS2_RC rc;
     TSS2_SYS_CONTEXT *sapi_context;
 
-    test_opts_t opts = {
-        .tcti_type      = TCTI_DEFAULT,
-        .device_file    = DEVICE_PATH_DEFAULT,
-        .socket_address = HOSTNAME_DEFAULT,
-        .socket_port    = PORT_DEFAULT,
-    };
+    test_opts_t opts = TEST_OPTS_DEFAULT;
 
     get_test_opts_from_env (&opts);
     if (sanity_check_test_opts (&opts) != 0)
         exit (1);
 
     sapi_context = sapi_init_from_opts (&opts);
-    if (sapi_context == NULL)
+    if (sapi_context == NULL) {
+        LOG_ERROR("sapi_init_from_opts failed");
         exit (1);
+    }
 
     rc = Tss2_Sys_Startup(sapi_context, TPM2_SU_CLEAR);
     if (rc != TSS2_RC_SUCCESS && rc != TPM2_RC_INITIALIZE) {

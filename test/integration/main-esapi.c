@@ -179,12 +179,7 @@ main(int argc, char *argv[])
 TSS_SAPI_FIRST_VERSION };
 
     int ret;
-    test_opts_t opts = {
-        .tcti_type = TCTI_DEFAULT,
-        .device_file = DEVICE_PATH_DEFAULT,
-        .socket_address = HOSTNAME_DEFAULT,
-        .socket_port = PORT_DEFAULT,
-    };
+    test_opts_t opts = TEST_OPTS_DEFAULT;
 
     get_test_opts_from_env(&opts);
     if (sanity_check_test_opts(&opts) != 0) {

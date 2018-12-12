@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS base
 RUN apt-get update && apt-get install -y \
     autoconf \
     autoconf-archive \
@@ -48,7 +48,35 @@ RUN apt-get install -y \
     liburiparser-dev \
     uthash-dev
 
+## Fuzzing
+FROM base AS fuzzing
+# TPM Fuzzing
+RUN apt-get install -y \
+    vim \
+    gdb
+COPY . /tmp/tpm2-tss/
+WORKDIR /tmp/tpm2-tss
+RUN ./bootstrap -I /usr/share/gnulib/m4
+RUN ./configure --enable-unit \
+  --enable-integration
+RUN make -j $(($(nproc)+1)) check && \
+  make clean
+ENV CC /usr/local/bin/afl-gcc
+ENV CXX /usr/local/bin/afl-g++
+RUN ./configure \
+  --enable-unit \
+  --enable-integration \
+  --enable-debug \
+  --enable-tcti-fuzzing \
+  --enable-tcti-device=no \
+  --enable-tcti-mssim=no \
+  --disable-shared
+RUN make -j $(($(nproc)+1))
+RUN ldconfig
+ENV LD_LIBRARY_PATH /usr/local/lib
+
 # TPM2-TSS
+FROM base AS unit
 COPY . /tmp/tpm2-tss/
 WORKDIR /tmp/tpm2-tss
 RUN ./bootstrap -I /usr/share/gnulib/m4 \

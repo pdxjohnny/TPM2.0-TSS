@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-2 */
 /***********************************************************************
- * Copyright (c) 2017-2018, Intel Corporation
+ * Copyright (c) 2018, Intel Corporation
  *
  * All rights reserved.
  ***********************************************************************/
@@ -9,48 +9,43 @@
 
 #define LOGMODULE test
 #include "tss2_sys.h"
+#include "tss2_tcti.h"
 #include "util/log.h"
 #include "test.h"
 #include "test-options.h"
 #include "context-util.h"
+#include "tss2-sys/sysapi_util.h"
+#include "tss2-tcti/tcti-fuzzing.h"
 
-/**
- * This program is a template for integration tests (ones that use the TCTI
- * and the SAPI contexts / API directly). It does nothing more than parsing
- * command line options that allow the caller (likely a script) to specify
- * which TCTI to use for the test.
- */
 int
-main (int   argc,
-      char *argv[])
+LLVMFuzzerTestOneInput (
+        const uint8_t *Data,
+        size_t Size)
 {
     TSS2_SYS_CONTEXT *sapi_context;
-    int ret;
+    _TSS2_SYS_CONTEXT_BLOB *ctx = NULL;
+    TSS2_TCTI_FUZZING_CONTEXT *tcti_fuzzing = NULL;
     test_opts_t opts = TEST_OPTS_DEFAULT;
-
-    (void) argc;
-    (void) argv;
 
     get_test_opts_from_env (&opts);
     if (sanity_check_test_opts (&opts) != 0) {
         LOG_ERROR("Checking test options");
-        return 99; /* fatal error */
+        exit(1); /* fatal error */
     }
     sapi_context = sapi_init_from_opts (&opts);
     if (sapi_context == NULL) {
         LOG_ERROR("SAPI context not initialized");
-        return 99; /* fatal error */
+        exit(1); /* fatal error */
     }
 
-    ret = Tss2_Sys_Startup(sapi_context, TPM2_SU_CLEAR);
-    if (ret != TSS2_RC_SUCCESS && ret != TPM2_RC_INITIALIZE) {
-        LOG_ERROR("TPM Startup FAILED! Response Code : 0x%x", ret);
-        exit(1);
-    }
+    ctx = syscontext_cast(sapi_context);
+    tcti_fuzzing = tcti_fuzzing_context_cast (ctx->tctiContext);
+    tcti_fuzzing->data = Data;
+    tcti_fuzzing->size = Size;
 
-    ret = test_invoke (sapi_context);
+    test_invoke (sapi_context);
 
     sapi_teardown_full (sapi_context);
 
-    return ret;
+    return 0;  // Non-zero return values are reserved for future use.
 }

@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: BSD-2
+# Copyright (c) 2018 Intel Corporation
+# All rights reserved.
+
+FUZZ_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration -fsanitize=fuzzer
+FUZZ_LDADD = $(TESTS_LDADD)
+
+fuzzdir = $(srcdir)
+fuzz-programs: $(fuzz_PROGRAMS)
+
+fuzz_PROGRAMS = $(TESTS_FUZZ)
+
+if ENABLE_TCTI_FUZZING
+TESTS_FUZZ =     test/fuzz/key-value-parse
+
+noinst_PROGRAMS += test/fuzz/key-value-parse
+test_fuzz_key_value_parse_CFLAGS  = $(CMOCKA_CFLAGS) $(FUZZ_CFLAGS)
+test_fuzz_key_value_parse_LDADD   = $(CMOCKA_LIBS) $(libutil)
+test_fuzz_key_value_parse_SOURCES = test/fuzz/key-value-parse.c
+endif # ENABLE_TCTI_FUZZING
+
+include Makefile-fuzz-generated.am

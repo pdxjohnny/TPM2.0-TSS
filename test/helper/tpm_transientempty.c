@@ -17,12 +17,7 @@ main (int argc, char *argv[])
     TSS2_RC rc;
     TSS2_SYS_CONTEXT *sapi_context;
 
-    test_opts_t opts = {
-        .tcti_type      = TCTI_DEFAULT,
-        .device_file    = DEVICE_PATH_DEFAULT,
-        .socket_address = HOSTNAME_DEFAULT,
-        .socket_port    = PORT_DEFAULT,
-    };
+    test_opts_t opts = TEST_OPTS_DEFAULT;
 
     get_test_opts_from_env (&opts);
     if (sanity_check_test_opts (&opts) != 0)

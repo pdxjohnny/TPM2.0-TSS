@@ -78,3 +78,12 @@ test/helper/tpm_startup
 test/helper/tpm_transientempty
 Doxyfile
 doc/rtf
+
+# ignore fuzzing files
+findings_dir/
+testcases/
+lengths/
+fuzzable/
+test/helper/fuzzing_inspect
+doxygen-doc/
+Makefile-fuzz-generated.am

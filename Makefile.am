@@ -151,6 +151,9 @@ include src_vars.mk
 # Add test definitions
 include Makefile-test.am
 
+# Add fuzz definitions
+include Makefile-fuzz.am
+
 ### Distribution files ###
 # Add udev rule
 udevrules_DATA   = dist/tpm-udev.rules
@@ -194,6 +197,12 @@ libutil = libutil.la
 noinst_LTLIBRARIES += $(libutil)
 libutil_la_CFLAGS = $(AM_CFLAGS)
 libutil_la_SOURCES = $(UTIL_SRC)
+
+### Internal fuzzing library
+libfuzzing = libfuzzing.la
+noinst_LTLIBRARIES += $(libfuzzing)
+libfuzzing_la_CFLAGS = $(AM_CFLAGS)
+libfuzzing_la_SOURCES = $(FUZZING_SRC)
 
 ### TCG TSS Marshaling/Unmarshaling spec library ###
 libtss2_mu = src/tss2-mu/libtss2-mu.la
@@ -240,11 +249,29 @@ src_tss2_tcti_libtss2_tcti_mssim_la_CFLAGS   = $(AM_CFLAGS) $(URIPARSER_CFLAGS)
 if HAVE_LD_VERSION_SCRIPT
 src_tss2_tcti_libtss2_tcti_mssim_la_LDFLAGS  = -Wl,--version-script=$(srcdir)/lib/tss2-tcti-mssim.map
 endif # HAVE_LD_VERSION_SCRIPT
-src_tss2_tcti_libtss2_tcti_mssim_la_LIBADD   = $(libtss2_mu) $(URIPARSER_LIBS) $(libutil)
+src_tss2_tcti_libtss2_tcti_mssim_la_LIBADD   = $(libtss2_mu) $(URIPARSER_LIBS) $(libutil) $(libfuzzing)
 src_tss2_tcti_libtss2_tcti_mssim_la_SOURCES  = \
     src/tss2-tcti/tcti-common.c src/tss2-tcti/tcti-common.h \
     src/tss2-tcti/tcti-mssim.c src/tss2-tcti/tcti-mssim.h
 endif # ENABLE_TCTI_MSSIM
+
+# tcti library used for fuzzing
+if ENABLE_TCTI_FUZZING
+libtss2_tcti_fuzzing = src/tss2-tcti/libtss2-tcti-fuzzing.la
+tss2_HEADERS += $(srcdir)/include/tss2/tss2_tcti_fuzzing.h
+lib_LTLIBRARIES += $(libtss2_tcti_fuzzing)
+nodist_pkgconfig_DATA += lib/tss2-tcti-fuzzing.pc
+EXTRA_DIST += lib/tss2-tcti-fuzzing.map lib/tss2-tcti-fuzzing.pc.in
+
+src_tss2_tcti_libtss2_tcti_fuzzing_la_CFLAGS   = $(AM_CFLAGS)
+if HAVE_LD_VERSION_SCRIPT
+src_tss2_tcti_libtss2_tcti_fuzzing_la_LDFLAGS  = -Wl,--version-script=$(srcdir)/lib/tss2-tcti-fuzzing.map
+endif # HAVE_LD_VERSION_SCRIPT
+src_tss2_tcti_libtss2_tcti_fuzzing_la_LIBADD   = $(libtss2_mu) $(libutil) $(libfuzzing)
+src_tss2_tcti_libtss2_tcti_fuzzing_la_SOURCES  = \
+    src/tss2-tcti/tcti-common.c src/tss2-tcti/tcti-common.h \
+    src/tss2-tcti/tcti-fuzzing.c src/tss2-tcti/tcti-fuzzing.h
+endif # ENABLE_TCTI_FUZZING
 
 ### TCG TSS SAPI spec library ###
 libtss2_sys = src/tss2-sys/libtss2-sys.la
