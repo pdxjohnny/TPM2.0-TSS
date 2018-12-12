@@ -14,8 +14,8 @@ if ENABLE_TCTI_FUZZING
 TESTS_FUZZ =     test/fuzz/key-value-parse
 
 noinst_PROGRAMS += test/fuzz/key-value-parse
-test_fuzz_key_value_parse_CFLAGS  = $(CMOCKA_CFLAGS) $(FUZZ_CFLAGS)
-test_fuzz_key_value_parse_LDADD   = $(CMOCKA_LIBS) $(libutil)
+test_fuzz_key_value_parse_CFLAGS  = $(FUZZ_CFLAGS)
+test_fuzz_key_value_parse_LDADD   = $(libutil)
 test_fuzz_key_value_parse_SOURCES = test/fuzz/key-value-parse.c
 endif # ENABLE_TCTI_FUZZING
 

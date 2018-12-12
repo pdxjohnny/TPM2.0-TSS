@@ -14,8 +14,8 @@ endif # ENABLE_TCTI_FUZZING
 '''
 MAKEFILE_FUZZ_TARGET = '''
 noinst_PROGRAMS += test/fuzz/%s
-test_fuzz_%s_CFLAGS  = $(CMOCKA_CFLAGS) $(FUZZ_CFLAGS)
-test_fuzz_%s_LDADD   = $(CMOCKA_LIBS) $(FUZZ_LDADD)
+test_fuzz_%s_CFLAGS  = $(FUZZ_CFLAGS)
+test_fuzz_%s_LDADD   = $(FUZZ_LDADD)
 test_fuzz_%s_SOURCES = test/fuzz/main-sapi.c \\
     test/integration/sapi-test-options.c test/integration/sapi-context-util.c \\
     test/fuzz/%s.c'''
@@ -33,7 +33,6 @@ SYS_COMPLETE_TEMPLATE_HEADER = '''/* SPDX-License-Identifier: BSD-2 */
 #include <stdarg.h>
 
 #include <setjmp.h>
-#include <cmocka.h>
 
 #include "tss2_mu.h"
 #include "tss2_sys.h"
