@@ -46,10 +46,6 @@ AUTORECONF=${AUTORECONF:-autoreconf}
 
 echo "Generating file lists: ${VARS_FILE}"
 (
-  src_listvar "src/fuzzing" "*.c" "FUZZING_C"
-  src_listvar "src/fuzzing" "*.h" "FUZZING_H"
-  printf "FUZZING_SRC = \$(FUZZING_C) \$(FUZZING_H)\n"
-
   src_listvar "src/util" "*.c" "UTIL_C"
   src_listvar "src/util" "*.h" "UTIL_H"
   printf "UTIL_SRC = \$(UTIL_C) \$(UTIL_H)\n"

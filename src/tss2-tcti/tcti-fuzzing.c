@@ -19,7 +19,6 @@
 
 #include "tcti-fuzzing.h"
 #include "tcti-common.h"
-#include "fuzzing/fuzzing.h"
 #include "util/key-value-parse.h"
 #define LOGMODULE tcti
 #include "util/log.h"
@@ -140,7 +139,6 @@ tcti_fuzzing_finalize(
     TSS2_TCTI_CONTEXT *tcti_ctx)
 {
     (void)(tcti_ctx);
-    close (fuzzing.fd.response_lengths);
 }
 
 TSS2_RC

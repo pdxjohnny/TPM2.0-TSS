@@ -11,6 +11,23 @@ fuzz-programs: $(fuzz_PROGRAMS)
 fuzz_PROGRAMS = $(TESTS_FUZZ)
 
 if ENABLE_TCTI_FUZZING
+# tcti library used for fuzzing
+libtss2_tcti_fuzzing = src/tss2-tcti/libtss2-tcti-fuzzing.la
+tss2_HEADERS += $(srcdir)/include/tss2/tss2_tcti_fuzzing.h
+lib_LTLIBRARIES += $(libtss2_tcti_fuzzing)
+nodist_pkgconfig_DATA += lib/tss2-tcti-fuzzing.pc
+EXTRA_DIST += lib/tss2-tcti-fuzzing.map lib/tss2-tcti-fuzzing.pc.in
+
+src_tss2_tcti_libtss2_tcti_fuzzing_la_CFLAGS   = $(AM_CFLAGS)
+if HAVE_LD_VERSION_SCRIPT
+src_tss2_tcti_libtss2_tcti_fuzzing_la_LDFLAGS  = -Wl,--version-script=$(srcdir)/lib/tss2-tcti-fuzzing.map
+endif # HAVE_LD_VERSION_SCRIPT
+src_tss2_tcti_libtss2_tcti_fuzzing_la_LIBADD   = $(libtss2_mu) $(libutil)
+src_tss2_tcti_libtss2_tcti_fuzzing_la_SOURCES  = \
+    src/tss2-tcti/tcti-common.c src/tss2-tcti/tcti-common.h \
+    src/tss2-tcti/tcti-fuzzing.c src/tss2-tcti/tcti-fuzzing.h
+endif # ENABLE_TCTI_FUZZING
+
 TESTS_FUZZ =     test/fuzz/key-value-parse
 
 noinst_PROGRAMS += test/fuzz/key-value-parse

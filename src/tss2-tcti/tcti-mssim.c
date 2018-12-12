@@ -21,7 +21,6 @@
 
 #include "tcti-mssim.h"
 #include "tcti-common.h"
-#include "fuzzing/fuzzing.h"
 #include "util/key-value-parse.h"
 #define LOGMODULE tcti
 #include "util/log.h"
@@ -365,7 +364,6 @@ tcti_mssim_receive (
     }
     LOGBLOB_DEBUG(response_buffer, tcti_common->header.size,
                   "Response buffer received:");
-    fuzzing.log_response(response_buffer, tcti_common->header.size);
 
     /* Receive the appended four bytes of 0's */
     ret = socket_recv_buf (tcti_mssim->tpm_sock,
