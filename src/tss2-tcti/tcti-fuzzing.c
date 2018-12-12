@@ -24,6 +24,45 @@
 #define LOGMODULE tcti
 #include "util/log.h"
 
+int
+fuzz_fill (
+        TSS2_SYS_CONTEXT *sysContext,
+        size_t count,
+        ...)
+{
+    va_list ap;
+    const uint8_t *data = NULL;
+    const uint8_t *curr = NULL;
+    size_t size = 0U;
+    size_t i = 0U;
+    void *dest;
+    size_t length = 0U;
+    size_t combined = 0U;
+    _TSS2_SYS_CONTEXT_BLOB *ctx = NULL;
+    TSS2_TCTI_FUZZING_CONTEXT *tcti_fuzzing = NULL;
+
+    ctx = syscontext_cast (sysContext);
+    tcti_fuzzing = tcti_fuzzing_context_cast (ctx->tctiContext);
+    data = tcti_fuzzing->data;
+    size = tcti_fuzzing->size;
+
+    va_start (ap, count);
+
+    for (i = 0U; i < (count / 2); ++i) {
+        length = va_arg (ap, size_t);
+        dest = va_arg (ap, void *);
+        curr = &data[combined];
+        combined += length;
+        if (size > combined) {
+            memcpy (dest, curr, length);
+        }
+    }
+
+    va_end (ap);
+
+    return EXIT_SUCCESS;
+}
+
 /*
  * This function wraps the "up-cast" of the opaque TCTI context type to the
  * type for the fuzzing TCTI context. The only safeguard we have to ensure this

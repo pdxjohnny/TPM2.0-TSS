@@ -11,6 +11,7 @@
 
 #include "tcti-common.h"
 #include "util/io.h"
+#include "tss2-sys/sysapi_util.h"
 
 #define TCTI_FUZZING_MAGIC 0x66757a7a696e6700ULL
 
@@ -22,5 +23,11 @@ typedef struct {
 
 TSS2_TCTI_FUZZING_CONTEXT*
 tcti_fuzzing_context_cast (TSS2_TCTI_CONTEXT *tcti_ctx);
+
+int
+fuzz_fill (
+        TSS2_SYS_CONTEXT *sysContext,
+        size_t count,
+        ...);
 
 #endif /* TCTI_FUZZING_H */

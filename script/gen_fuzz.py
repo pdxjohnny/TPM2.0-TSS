@@ -19,8 +19,7 @@ test_fuzz_%s_LDADD   = $(CMOCKA_LIBS) $(FUZZ_LDADD)
 test_fuzz_%s_SOURCES = test/fuzz/main-sapi.c \\
     test/integration/sapi-test-options.c test/integration/sapi-context-util.c \\
     test/fuzz/%s.c'''
-SYS_COMPLETE_TEMPLATE_HEADER = '''
-/* SPDX-License-Identifier: BSD-2 */
+SYS_COMPLETE_TEMPLATE_HEADER = '''/* SPDX-License-Identifier: BSD-2 */
 /***********************************************************************
  * Copyright (c) 2018, Intel Corporation
  *
@@ -31,6 +30,7 @@ SYS_COMPLETE_TEMPLATE_HEADER = '''
 #include <stdio.h>
 #include <string.h>
 #include <poll.h>
+#include <stdarg.h>
 
 #include <setjmp.h>
 #include <cmocka.h>
@@ -41,6 +41,15 @@ SYS_COMPLETE_TEMPLATE_HEADER = '''
 
 #include "tss2-tcti/tcti-common.h"
 #include "tss2-tcti/tcti-device.h"
+
+#define LOGMODULE fuzz
+#include "tss2_tcti.h"
+#include "util/log.h"
+#include "test.h"
+#include "test-options.h"
+#include "context-util.h"
+#include "tss2-sys/sysapi_util.h"
+#include "tss2-tcti/tcti-fuzzing.h"
 
 int
 test_invoke (
@@ -64,6 +73,28 @@ SYS_COMPLETE_TEMPLATE_HAS_ARGS = SYS_COMPLETE_TEMPLATE_HEADER + '''
     return 0;
 }
 '''
+SYS_PREPARE_TEMPLATE_HAS_ARGS = SYS_COMPLETE_TEMPLATE_HEADER + '''
+{
+    int ret;
+    %s
+
+    ret = fuzz_fill (
+        sysContext,
+        %d,
+        %s
+    );
+    if (ret) {
+        return ret;
+    }
+
+    %s (
+        sysContext,
+        %s
+    );
+
+    return EXIT_SUCCESS;
+}
+'''
 
 def gen_file(function):
     function_name = function.split('\n')[0]\
@@ -74,6 +105,13 @@ def gen_file(function):
             for arg in function[function.index('(') + 1:function.index(');')]\
             .split(',') \
             if not 'TSS2_SYS_CONTEXT' in arg]
+    if '_Complete' in function_name:
+        return gen_complete(function, function_name, args)
+    if '_Prepare' in function_name:
+        return gen_prepare(function, function_name, args)
+    raise NotImplementedError('Unknown function type %r' % (function_name,))
+
+def gen_complete(function, function_name, args):
     if not args:
         return function_name, SYS_COMPLETE_TEMPLATE_NO_ARGS % (function_name)
     arg_definitions = (';\n' + ' ' * 4).join([
@@ -84,15 +122,35 @@ def gen_file(function):
                                                             function_name,
                                                             arg_call)
 
+def gen_prepare(function, function_name, args):
+    if not args:
+        return function_name, None
+    arg_definitions = (';\n' + ' ' * 4).join([
+        arg.replace('*', '') for arg in args]) + ';'
+    arg_call = (',\n' + ' ' * 8).join([
+        arg.replace('*', '&').split()[-1] for arg in args])
+    fill_fuzz_args = (',\n' + ' ' * 8).join([
+        ('sizeof (%s), &%s' % \
+                (arg.split()[-2], arg.replace('*', '').split()[-1])) \
+        for arg in args])
+    return function_name, SYS_PREPARE_TEMPLATE_HAS_ARGS % (arg_definitions,
+                                                           len(args) * 2,
+                                                           fill_fuzz_args,
+                                                           function_name,
+                                                           arg_call)
+
 def gen_files(header):
     current_function = ''
     with open(header, 'r') as header_fd:
         for line in header_fd:
-            if '_Complete' in line:
+            if '_Complete' in line or '_Prepare' in line:
                 current_function = line
             elif current_function and ');' in line:
                 current_function += line.rstrip()
                 function_name, contents = gen_file(current_function)
+                if contents is None:
+                    print(function_name, 'takes no args, can\'t fuzz')
+                    continue
                 filepath = os.path.join('test', 'fuzz', function_name + '.c')
                 with open(filepath, 'w') as fuzzer_fd:
                     fuzzer_fd.write(contents)

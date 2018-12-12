@@ -22,6 +22,7 @@ LLVMFuzzerTestOneInput (
         const uint8_t *Data,
         size_t Size)
 {
+    int ret;
     TSS2_SYS_CONTEXT *sapi_context;
     _TSS2_SYS_CONTEXT_BLOB *ctx = NULL;
     TSS2_TCTI_FUZZING_CONTEXT *tcti_fuzzing = NULL;
@@ -38,14 +39,19 @@ LLVMFuzzerTestOneInput (
         exit(1); /* fatal error */
     }
 
-    ctx = syscontext_cast(sapi_context);
+    ctx = syscontext_cast (sapi_context);
     tcti_fuzzing = tcti_fuzzing_context_cast (ctx->tctiContext);
     tcti_fuzzing->data = Data;
     tcti_fuzzing->size = Size;
 
-    test_invoke (sapi_context);
+    ret = test_invoke (sapi_context);
 
     sapi_teardown_full (sapi_context);
+
+    if (ret) {
+        LOG_ERROR("Test failed");
+        exit(1); /* fatal error */
+    }
 
     return 0;  // Non-zero return values are reserved for future use.
 }
