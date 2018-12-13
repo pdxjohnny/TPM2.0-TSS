@@ -50,9 +50,9 @@ fuzz_fill (
     for (i = 0U; i < (count / 2); ++i) {
         length = va_arg (ap, size_t);
         dest = va_arg (ap, void *);
-        curr = &data[combined];
-        combined += length;
-        if (size > combined) {
+        if (size > (combined + length)) {
+            curr = &data[combined];
+            combined += length;
             memcpy (dest, curr, length);
         }
     }
@@ -210,6 +210,8 @@ Tss2_Tcti_Fuzzing_Init (
     size_t *size,
     const char *conf)
 {
+    (void) conf;
+
     if (size == NULL) {
         return TSS2_TCTI_RC_BAD_VALUE;
     }
