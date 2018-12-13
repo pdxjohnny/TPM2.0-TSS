@@ -217,9 +217,6 @@ Tss2_Tcti_Fuzzing_Init (
         *size = sizeof (TSS2_TCTI_FUZZING_CONTEXT);
         return TSS2_RC_SUCCESS;
     }
-    if (conf == NULL) {
-        return TSS2_TCTI_RC_BAD_VALUE;
-    }
     if (*size != sizeof (TSS2_TCTI_FUZZING_CONTEXT)) {
         return TSS2_TCTI_RC_BAD_VALUE;
     }
@@ -235,7 +232,7 @@ const TSS2_TCTI_INFO tss2_tcti_info = {
     .version = TCTI_VERSION,
     .name = "tcti-fuzzing",
     .description = "TCTI module for fuzzing the System API.",
-    .config_help = "Path to the fuzzing_lengths.log file.",
+    .config_help = "Takes no configuration.",
     .init = Tss2_Tcti_Fuzzing_Init,
 };
 

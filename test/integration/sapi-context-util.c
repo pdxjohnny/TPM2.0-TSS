@@ -98,13 +98,13 @@ tcti_socket_init(char const *host, uint16_t port)
  * function. This structure must be freed by the caller.
  */
 TSS2_TCTI_CONTEXT *
-tcti_fuzzing_init(char const *fuzzing_file)
+tcti_fuzzing_init()
 {
     size_t size;
     TSS2_RC rc;
     TSS2_TCTI_CONTEXT *tcti_ctx;
 
-    rc = Tss2_Tcti_Fuzzing_Init(NULL, &size, fuzzing_file);
+    rc = Tss2_Tcti_Fuzzing_Init(NULL, &size, NULL);
     if (rc != TSS2_RC_SUCCESS) {
         fprintf(stderr, "Faled to get allocation size for tcti context: "
                 "0x%x\n", rc);
@@ -116,7 +116,7 @@ tcti_fuzzing_init(char const *fuzzing_file)
                 strerror(errno));
         return NULL;
     }
-    rc = Tss2_Tcti_Fuzzing_Init(tcti_ctx, &size, fuzzing_file);
+    rc = Tss2_Tcti_Fuzzing_Init(tcti_ctx, &size, NULL);
     if (rc != TSS2_RC_SUCCESS) {
         fprintf(stderr, "Failed to initialize tcti context: 0x%x\n", rc);
         free(tcti_ctx);
@@ -198,7 +198,7 @@ tcti_init_from_opts(test_opts_t * options)
 #endif /* HAVE_TCTI_MSSIM */
 #ifdef HAVE_TCTI_FUZZING
     case FUZZING_TCTI:
-        return tcti_fuzzing_init(options->fuzzing_file);
+        return tcti_fuzzing_init();
 #endif /* HAVE_TCTI_FUZZING */
     default:
         return NULL;

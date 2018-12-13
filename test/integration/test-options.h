@@ -20,22 +20,17 @@
 #define HOSTNAME_DEFAULT "127.0.0.1"
 #define PORT_DEFAULT     2321
 
-/* Defaults for Fuzzing TCTI file */
-#define FUZZING_DEFAULT "fuzzing_lengths.log"
-
 /* environment variables holding TCTI config */
 #define ENV_TCTI_NAME      "TPM20TEST_TCTI_NAME"
 #define ENV_DEVICE_FILE    "TPM2OTEST_DEVICE_FILE"
 #define ENV_SOCKET_ADDRESS "TPM20TEST_SOCKET_ADDRESS"
 #define ENV_SOCKET_PORT    "TPM20TEST_SOCKET_PORT"
-#define ENV_FUZZING_FILE   "TPM20TEST_FUZZING_FILE"
 
 #define TEST_OPTS_DEFAULT { \
     .tcti_type = TCTI_DEFAULT, \
     .device_file = DEVICE_PATH_DEFAULT, \
     .socket_address = HOSTNAME_DEFAULT, \
     .socket_port = PORT_DEFAULT, \
-    .fuzzing_file = FUZZING_DEFAULT, \
 }
 
 typedef enum {
@@ -51,7 +46,6 @@ typedef struct {
     char *device_file;
     char *socket_address;
     uint16_t socket_port;
-    char *fuzzing_file;
 } test_opts_t;
 
 /* functions to get test options from the user and to print helpful stuff */

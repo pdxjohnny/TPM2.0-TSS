@@ -91,10 +91,6 @@ sanity_check_test_opts(test_opts_t * opts)
         }
         break;
     case FUZZING_TCTI:
-        if (opts->fuzzing_file == NULL) {
-            fprintf(stderr, "fuzzing_file is NULL, check env\n");
-            return 1;
-        }
         break;
     default:
         fprintf(stderr, "unknown TCTI type, check env\n");
@@ -126,9 +122,6 @@ get_test_opts_from_env(test_opts_t * test_opts)
     env_str = getenv(ENV_SOCKET_PORT);
     if (env_str != NULL)
         test_opts->socket_port = strtol(env_str, &end_ptr, 10);
-    env_str = getenv(ENV_FUZZING_FILE);
-    if (env_str != NULL)
-        test_opts->fuzzing_file = env_str;
     return 0;
 }
 
@@ -143,5 +136,4 @@ dump_test_opts(test_opts_t * opts)
     printf("  device_file:    %s\n", opts->device_file);
     printf("  socket_address: %s\n", opts->socket_address);
     printf("  socket_port:    %d\n", opts->socket_port);
-    printf("  fuzzing_file:   %s\n", opts->fuzzing_file);
 }
