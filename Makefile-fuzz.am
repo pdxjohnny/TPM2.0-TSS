@@ -11,12 +11,5 @@ fuzz-programs: $(fuzz_PROGRAMS)
 
 fuzz_PROGRAMS = $(TESTS_FUZZ)
 
-TESTS_FUZZ =     test/fuzz/key-value-parse
-
-noinst_PROGRAMS += test/fuzz/key-value-parse
-test_fuzz_key_value_parse_CFLAGS  = $(FUZZ_CFLAGS)
-test_fuzz_key_value_parse_LDADD   = $(libutil)
-test_fuzz_key_value_parse_SOURCES = test/fuzz/key-value-parse.c
-
 include Makefile-fuzz-generated.am
 endif # ENABLE_TCTI_FUZZING

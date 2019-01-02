@@ -8,7 +8,7 @@ MAKEFILE_FUZZ = '''# SPDX-License-Identifier: BSD-2
 # All rights reserved.
 
 if ENABLE_TCTI_FUZZING
-TESTS_FUZZ += %s
+TESTS_FUZZ = %s
 %s
 endif # ENABLE_TCTI_FUZZING
 '''
