@@ -13,12 +13,11 @@ TESTS_FUZZ = %s
 endif # ENABLE_TCTI_FUZZING
 '''
 MAKEFILE_FUZZ_TARGET = '''
-noinst_PROGRAMS += test/fuzz/%s
-test_fuzz_%s_CFLAGS  = $(FUZZ_CFLAGS)
-test_fuzz_%s_LDADD   = $(FUZZ_LDADD)
-test_fuzz_%s_SOURCES = test/fuzz/main-sapi.c \\
-    test/integration/sapi-test-options.c test/integration/sapi-context-util.c \\
-    test/fuzz/%s.c'''
+noinst_PROGRAMS += test/fuzz/%s.fuzz
+test_fuzz_%s_fuzz_CFLAGS  = $(FUZZ_CFLAGS)
+test_fuzz_%s_fuzz_LDADD   = $(FUZZ_LDADD)
+test_fuzz_%s_fuzz_SOURCES = test/fuzz/main-sapi.c \\
+    test/fuzz/%s.fuzz.c'''
 SYS_COMPLETE_TEMPLATE_HEADER = '''/* SPDX-License-Identifier: BSD-2 */
 /***********************************************************************
  * Copyright (c) 2018, Intel Corporation
@@ -150,7 +149,7 @@ def gen_files(header):
                 if contents is None:
                     print(function_name, 'takes no args, can\'t fuzz')
                     continue
-                filepath = os.path.join('test', 'fuzz', function_name + '.c')
+                filepath = os.path.join('test', 'fuzz', function_name + '.fuzz.c')
                 with open(filepath, 'w') as fuzzer_fd:
                     fuzzer_fd.write(contents)
                 yield function_name
@@ -165,7 +164,7 @@ def main():
     args = parser.parse_args()
 
     functions = list(gen_files(args.header))
-    files = ' \\\n    '.join(['test/fuzz/%s' % (function) \
+    files = ' \\\n    '.join(['test/fuzz/%s.fuzz' % (function) \
             for function in functions])
     targets = '\n'.join([MAKEFILE_FUZZ_TARGET % tuple(list(itertools.chain(\
             ([function] * 5)))) for function in functions])
