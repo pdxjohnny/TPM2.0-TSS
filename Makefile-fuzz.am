@@ -2,8 +2,11 @@
 # Copyright (c) 2018 Intel Corporation
 # All rights reserved.
 
-if ENABLE_TCTI_FUZZING
-FUZZ_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration -fsanitize=fuzzer
+TEST_EXTENSIONS += .fuzz
+FUZZ_LOG_COMPILER = $(srcdir)/script/fuzz-log-compiler.sh
+
+if ENABLE_FUZZING
+FUZZ_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration
 FUZZ_LDADD = $(TESTS_LDADD)
 
 noinst_LTLIBRARIES += test/fuzz/libfuzz_utils.la
@@ -13,9 +16,6 @@ test_fuzz_libfuzz_utils_la_SOURCES = \
     test/integration/sapi-context-util.c test/integration/context-util.h \
     test/integration/sapi-test-options.c test/integration/test-options.h
 
-TEST_EXTENSIONS += .fuzz
-FUZZ_LOG_COMPILER = $(srcdir)/script/fuzz-log-compiler.sh
-
 fuzzdir = $(srcdir)
 fuzz-targets: $(fuzz_PROGRAMS)
 
@@ -23,4 +23,4 @@ check_PROGRAMS += $(TESTS_FUZZ)
 fuzz_PROGRAMS = $(TESTS_FUZZ)
 
 include Makefile-fuzz-generated.am
-endif # ENABLE_TCTI_FUZZING
+endif # ENABLE_FUZZING
