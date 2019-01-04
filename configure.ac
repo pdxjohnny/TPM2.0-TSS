@@ -180,11 +180,11 @@ AC_ARG_ENABLE([integration],
     [enable_integration=no])
 AS_IF([test "x$enable_integration" = "xyes"],
       [ERROR_IF_NO_PROG([tpm_server])
-       ERROR_IF_NO_PROG([netstat])
+       ERROR_IF_NO_PROG([ss])
        ERROR_IF_NO_PROG([ps])
        ERROR_IF_NO_PROG([echo])
        ERROR_IF_NO_PROG([kill])
-       ERROR_IF_NO_PROG([nohup])
+       ERROR_IF_NO_PROG([stdbuf])
        ERROR_IF_NO_PROG([sleep])
        ERROR_IF_NO_PROG([cat])
        ERROR_IF_NO_PROG([realpath])
@@ -292,6 +292,7 @@ AS_IF([test "x$enable_defaultflags" = "xyes"],
       # work around GCC bug #53119
       #   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
       ADD_COMPILER_FLAG([-Wno-missing-braces])
+      ADD_COMPILER_FLAG([-Wstrict-overflow=5])
       ADD_LINK_FLAG([-Wl,--no-undefined])
       ADD_LINK_FLAG([-Wl,-z,noexecstack])
       ADD_LINK_FLAG([-Wl,-z,now])
