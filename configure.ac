@@ -204,38 +204,26 @@ AS_IF([test "x$enable_integration" = "xyes"],
        AC_SUBST([ENABLE_INTEGRATION], [$enable_integration])])
 AM_CONDITIONAL([ENABLE_INTEGRATION],[test "x$enable_integration" = "xyes"])
 #
-# enable fuzz tests
+# fuzz testing
 #
-AC_ARG_ENABLE([fuzzing],
-    [AS_HELP_STRING([--enable-fuzzing],
-        [build and execute fuzz tests (default is no)])],
-    [enable_fuzzing=$enableval],
-    [enable_fuzzing=no])
-AS_IF([test "x$enable_fuzzing" = "xyes"],
-       AS_IF([test "x$enable_tcti_fuzzing" = xno],
-             AC_MSG_ERROR([Fuzz tests can not be enabled without the TCTI_FUZZING module]))
-       AC_SUBST([ENABLE_FUZZING], [$enable_fuzzing]))
-AM_CONDITIONAL([ENABLE_FUZZING],[test "x$enable_fuzzing" = "xyes"])
-AS_IF([test "x$enable_fuzzing" = "xyes"],
-      [
-      ADD_COMPILER_FLAG([-fsanitize=fuzzer-no-link])
-      ])
-#
-# fuzz tests run under OSS Fuzz link to an OSS Fuzz provided library
-#
-AC_ARG_ENABLE([oss-fuzz],
-              [AS_HELP_STRING([--enable-oss-fuzz],
-                              [link fuzz tests to oss fuzz libraries (default is no)])],
-              [enable_oss_fuzz=$enableval],
-              [enable_oss_fuzz=no])
-AM_CONDITIONAL([ENABLE_OSS_FUZZ],[test "x$enable_oss_fuzz" = "xyes"])
-AS_IF([test "x$enable_oss_fuzz" = "xyes"],
-      [
-      ADD_LINK_FLAG([-lFuzzingEngine])
-      ],
-      [
-      ADD_COMPILER_FLAG([-fsanitize=fuzzer])
-      ])
+AC_ARG_WITH([fuzzing],
+            [AS_HELP_STRING([--with-fuzzing={none,libfuzzer,ossfuzz}],
+                            [fuzzing to build with (default is none)])],
+            [],
+            [with_fuzzing=none])
+AS_CASE(["x$with_fuzzing"],
+        ["xnone"],
+        [],
+        ["xlibfuzzer"],
+        [ADD_COMPILER_FLAG([-fsanitize=fuzzer])],
+        ["xossfuzz"],
+        [ADD_LINK_FLAG([-lFuzzingEngine])],
+        [AC_MSG_ERROR([Bad value for --with-fuzzing])])
+AM_CONDITIONAL([ENABLE_FUZZING],[test "x$with_fuzzing" != "xnone"])
+AM_COND_IF([ENABLE_FUZZING],
+           [ADD_COMPILER_FLAG([-fsanitize=fuzzer-no-link])
+            AS_IF([test "x$enable_tcti_fuzzng" = "xno"],
+                 AC_MSG_ERROR([Fuzz tests can not be enabled without the TCTI_FUZZING module]))])
 
 gl_LD_VERSION_SCRIPT
 
@@ -372,8 +360,7 @@ AC_MSG_RESULT([
     tctidefaultmodule:  $with_tctidefaultmodule
     tctidefaultconfig:  $with_tctidefaultconfig
     unit:               $enable_unit
-    fuzzing:            $enable_fuzzing
-    oss-fuzz:           $enable_oss_fuzz
+    fuzzing:            $with_fuzzing
     debug:              $enable_debug
     maxloglevel:        $with_maxloglevel
     doxygen:            $DX_FLAG_doc $enable_doxygen_doc
