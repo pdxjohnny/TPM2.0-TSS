@@ -46,39 +46,29 @@ RUN apt-get install -y \
     libgcrypt20-dev \
     libtool \
     liburiparser-dev \
-    uthash-dev
+    uthash-dev \
+    python3 \
+    clang
+
+# TPM Fuzzing
+COPY . /tmp/tpm2-tss/
+WORKDIR /tmp/tpm2-tss
 
 ## Fuzzing
 FROM base AS fuzzing
-# TPM Fuzzing
-RUN apt-get install -y \
-    vim \
-    gdb
-COPY . /tmp/tpm2-tss/
-WORKDIR /tmp/tpm2-tss
-RUN ./bootstrap -I /usr/share/gnulib/m4
-RUN ./configure --enable-unit \
-  --enable-integration
-RUN make -j $(($(nproc)+1)) check && \
-  make clean
-ENV CC /usr/local/bin/afl-gcc
-ENV CXX /usr/local/bin/afl-g++
-RUN ./configure \
-  --enable-unit \
-  --enable-integration \
-  --enable-debug \
-  --enable-tcti-fuzzing \
-  --enable-tcti-device=no \
-  --enable-tcti-mssim=no \
-  --disable-shared
-RUN make -j $(($(nproc)+1))
-RUN ldconfig
-ENV LD_LIBRARY_PATH /usr/local/lib
+RUN ./bootstrap -I /usr/share/gnulib/m4 \
+  && ./configure \
+     --enable-fuzzing \
+     --enable-debug \
+     --enable-tcti-fuzzing \
+     --enable-tcti-device=no \
+     --enable-tcti-mssim=no \
+     --disable-shared \
+  && make -j $(nproc) check
+RUN cat test-suite.log
 
 # TPM2-TSS
-FROM base AS unit
-COPY . /tmp/tpm2-tss/
-WORKDIR /tmp/tpm2-tss
+FROM base
 RUN ./bootstrap -I /usr/share/gnulib/m4 \
 	&& ./configure --enable-unit \
 	&& make -j$(nproc) check \

@@ -213,8 +213,8 @@ AC_ARG_ENABLE([fuzzing],
     [enable_fuzzing=no])
 AS_IF([test "x$enable_fuzzing" = "xyes"],
        AS_IF([test "x$enable_tcti_fuzzing" = xno],
-             AC_MSG_ERROR([Fuzz tests can not be enabled without the TCTI_FUZZING module])])
-       AC_SUBST([ENABLE_FUZZING], [$enable_fuzzing])])
+             AC_MSG_ERROR([Fuzz tests can not be enabled without the TCTI_FUZZING module]))
+       AC_SUBST([ENABLE_FUZZING], [$enable_fuzzing]))
 AM_CONDITIONAL([ENABLE_FUZZING],[test "x$enable_fuzzing" = "xyes"])
 AS_IF([test "x$enable_fuzzing" = "xyes"],
       [
@@ -231,7 +231,7 @@ AC_ARG_ENABLE([oss-fuzz],
 AM_CONDITIONAL([ENABLE_OSS_FUZZ],[test "x$enable_oss_fuzz" = "xyes"])
 AS_IF([test "x$enable_oss_fuzz" = "xyes"],
       [
-      ADD_COMPILER_FLAG([-lFuzzingEngine])
+      ADD_LINK_FLAG([-lFuzzingEngine])
       ],
       [
       ADD_COMPILER_FLAG([-fsanitize=fuzzer])
