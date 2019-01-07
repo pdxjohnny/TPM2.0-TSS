@@ -7,10 +7,15 @@ FUZZ_LOG_COMPILER = $(srcdir)/script/fuzz-log-compiler.sh
 
 if ENABLE_FUZZING
 FUZZ_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration
-FUZZ_LDADD = $(TESTS_LDADD)
+FUZZ_CPPFLAGS = $(INCLUDE_DIRS) -I$(srcdir)/test/integration \
+  $(LIB_FUZZING_ENGINE)
+FUZZ_LDADD = $(TESTS_LDADD) $(FUZZ_LDFLAGS)
+
+noinst_LTLIBRARIES += test/fuzz/libfuzz_sapi.la
+test_fuzz_libfuzz_sapi_la_CFLAGS = $(AM_CFLAGS) $(FUZZ_CFLAGS)
+test_fuzz_libfuzz_sapi_la_SOURCES = test/fuzz/main-sapi.c
 
 noinst_LTLIBRARIES += test/fuzz/libfuzz_utils.la
-
 test_fuzz_libfuzz_utils_la_CFLAGS = $(AM_CFLAGS) $(FUZZ_CFLAGS)
 test_fuzz_libfuzz_utils_la_SOURCES = \
     test/integration/sapi-context-util.c test/integration/context-util.h \

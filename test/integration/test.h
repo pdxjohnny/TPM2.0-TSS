@@ -18,4 +18,12 @@
  * Return values:
  * A successful test will return 0, any other value indicates failure.
  */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int test_invoke(TSS2_SYS_CONTEXT * sapi_context);
+
+#ifdef __cplusplus
+}
+#endif

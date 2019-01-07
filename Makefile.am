@@ -22,7 +22,7 @@ noinst_PROGRAMS =
 @CODE_COVERAGE_RULES@
 
 # ax_doxygen
-@DX_RULES@
+# @DX_RULES@
 DX_CLEANFILES = doxygen-doc
 MOSTLYCLEANFILES += $(DX_CLEANFILES)
 

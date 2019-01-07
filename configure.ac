@@ -10,6 +10,7 @@ AC_INIT([tpm2-tss],
         [https://github.com/tpm2-software/tpm2-tss])
 AC_CONFIG_MACRO_DIR([m4])
 : ${CFLAGS=""}
+AC_PROG_CXX([clang++ g++])
 AC_PROG_CC([clang gcc])
 LT_INIT()
 AM_INIT_AUTOMAKE([foreign
@@ -215,9 +216,11 @@ AS_CASE(["x$with_fuzzing"],
         ["xnone"],
         [],
         ["xlibfuzzer"],
-        [ADD_COMPILER_FLAG([-fsanitize=fuzzer])],
+        [ADD_FUZZING_FLAG([-fsanitize=fuzzer])],
         ["xossfuzz"],
-        [ADD_LINK_FLAG([-lFuzzingEngine])],
+        [AS_IF([test "x$LIB_FUZZING_ENGINE" = "x"],
+               AC_MSG_ERROR([OSS Fuzz testing requires LIB_FUZZING_ENGINE environment variable be set]))
+         ADD_FUZZING_FLAG([-lFuzzingEngine])],
         [AC_MSG_ERROR([Bad value for --with-fuzzing])])
 AM_CONDITIONAL([ENABLE_FUZZING],[test "x$with_fuzzing" != "xnone"])
 AM_COND_IF([ENABLE_FUZZING],
@@ -226,6 +229,7 @@ AM_COND_IF([ENABLE_FUZZING],
                  AC_MSG_ERROR([Fuzz tests can not be enabled without the TCTI_FUZZING module]))])
 
 gl_LD_VERSION_SCRIPT
+AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "x$have_ld_version_script" = "xyes")
 
 AC_ARG_WITH([maxloglevel],
             [AS_HELP_STRING([--with-maxloglevel={none,error,warning,info,debug,trace}],
@@ -329,21 +333,21 @@ AM_CONDITIONAL([PTPMMANDATORY],[test "x$enable_ptpm_mandatory" = "xyes"])
 AM_CONDITIONAL([TESTPTPM],[test "x$with_ptpm_set" = "xyes" -a "x$with_ptpm_set" = "xyes"])
 
 dnl --------- Doxy Gen -----------------------
-DX_DOXYGEN_FEATURE(ON)
-DX_DOT_FEATURE(OFF)
-DX_HTML_FEATURE(ON)
-DX_CHM_FEATURE(OFF)
-DX_CHI_FEATURE(OFF)
-DX_MAN_FEATURE(ON)
-DX_RTF_FEATURE(ON)
-DX_XML_FEATURE(OFF)
-DX_PDF_FEATURE(OFF)
-DX_PS_FEATURE(OFF)
-DX_INIT_DOXYGEN($PACKAGE_NAME, [Doxyfile], [doxygen-doc])
-AM_CONDITIONAL(DOXYMAN, [test $DX_FLAG_man -eq 1])
-
-AS_IF([test "x$enable_doxygen_doc" != xno],
-      [ERROR_IF_NO_PROG([doxygen])])
+# DX_DOXYGEN_FEATURE(ON)
+# DX_DOT_FEATURE(OFF)
+# DX_HTML_FEATURE(ON)
+# DX_CHM_FEATURE(OFF)
+# DX_CHI_FEATURE(OFF)
+# DX_MAN_FEATURE(ON)
+# DX_RTF_FEATURE(ON)
+# DX_XML_FEATURE(OFF)
+# DX_PDF_FEATURE(OFF)
+# DX_PS_FEATURE(OFF)
+# DX_INIT_DOXYGEN($PACKAGE_NAME, [Doxyfile], [doxygen-doc])
+AM_CONDITIONAL(DOXYMAN, [test 0 -eq 1])
+#
+# AS_IF([test "x$enable_doxygen_doc" != xno],
+#       [ERROR_IF_NO_PROG([doxygen])])
 
 AX_CODE_COVERAGE
 

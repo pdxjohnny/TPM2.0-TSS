@@ -14,10 +14,9 @@ endif # ENABLE_TCTI_FUZZING
 '''
 MAKEFILE_FUZZ_TARGET = '''
 noinst_PROGRAMS += test/fuzz/%s.fuzz
-test_fuzz_%s_fuzz_CFLAGS  = $(FUZZ_CFLAGS)
-test_fuzz_%s_fuzz_LDADD   = $(FUZZ_LDADD)
-test_fuzz_%s_fuzz_SOURCES = test/fuzz/main-sapi.c \\
-    test/fuzz/%s.fuzz.c'''
+test_fuzz_%s_fuzz_CPPFLAGS = $(FUZZ_CPPFLAGS)
+test_fuzz_%s_fuzz_LDADD    = $(FUZZ_LDADD)
+test_fuzz_%s_fuzz_SOURCES  = test/fuzz/%s.fuzz.cpp'''
 SYS_COMPLETE_TEMPLATE_HEADER = '''/* SPDX-License-Identifier: BSD-2 */
 /***********************************************************************
  * Copyright (c) 2018, Intel Corporation
@@ -49,6 +48,7 @@ SYS_COMPLETE_TEMPLATE_HEADER = '''/* SPDX-License-Identifier: BSD-2 */
 #include "tss2-sys/sysapi_util.h"
 #include "tss2-tcti/tcti-fuzzing.h"
 
+extern "C"
 int
 test_invoke (
         TSS2_SYS_CONTEXT *sysContext)'''
@@ -123,8 +123,8 @@ def gen_complete(function, function_name, args):
 def gen_prepare(function, function_name, args):
     if not args:
         return function_name, None
-    arg_definitions = (';\n' + ' ' * 4).join([
-        arg.replace('*', '') for arg in args]) + ';'
+    arg_definitions = (' = {0};\n' + ' ' * 4).join([
+        arg.replace('*', '') for arg in args]) + ' = {0};'
     arg_call = (',\n' + ' ' * 8).join([
         arg.replace('*', '&').split()[-1] for arg in args])
     fill_fuzz_args = (',\n' + ' ' * 8).join([
@@ -149,7 +149,8 @@ def gen_files(header):
                 if contents is None:
                     print(function_name, 'takes no args, can\'t fuzz')
                     continue
-                filepath = os.path.join('test', 'fuzz', function_name + '.fuzz.c')
+                filepath = os.path.join('test', 'fuzz',
+                        function_name + '.fuzz.cpp')
                 with open(filepath, 'w') as fuzzer_fd:
                     fuzzer_fd.write(contents)
                 yield function_name

@@ -50,3 +50,20 @@ AC_DEFUN([ADD_LINK_FLAG],[
         )]
     )]
 )
+dnl ADD_FUZZING_FLAG:
+dnl   A macro to add a CFLAG to the EXTRA_CFLAGS variable. This macro will
+dnl   check to be sure the compiler supports the flag. Flags can be made
+dnl   mandatory (configure will fail).
+dnl $1: C compiler flag to add to EXTRA_CFLAGS.
+dnl $2: Set to "required" to cause configure failure if flag not supported.
+AC_DEFUN([ADD_FUZZING_FLAG],[
+    AX_CHECK_COMPILE_FLAG([$1],[
+        FUZZ_LDFLAGS="$FUZZ_LDFLAGS $1"
+        AC_SUBST([FUZZ_LDFLAGS])],[
+        AS_IF([test x$2 != xrequired],[
+            AC_MSG_WARN([Optional CFLAG "$1" not supported by your compiler, continuing.])],[
+            AC_MSG_ERROR([Required CFLAG "$1" not supported by your compiler, aborting.])]
+        )],[
+        -Wall -Werror]
+    )]
+)
