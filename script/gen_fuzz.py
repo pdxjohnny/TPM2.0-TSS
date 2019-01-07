@@ -32,6 +32,7 @@ SYS_COMPLETE_TEMPLATE_HEADER = '''/* SPDX-License-Identifier: BSD-2 */
 
 #include <setjmp.h>
 
+extern "C" {
 #include "tss2_mu.h"
 #include "tss2_sys.h"
 #include "tss2_tcti_device.h"
@@ -47,6 +48,7 @@ SYS_COMPLETE_TEMPLATE_HEADER = '''/* SPDX-License-Identifier: BSD-2 */
 #include "context-util.h"
 #include "tss2-sys/sysapi_util.h"
 #include "tss2-tcti/tcti-fuzzing.h"
+}
 
 extern "C"
 int
