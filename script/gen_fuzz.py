@@ -126,7 +126,7 @@ def gen_prepare(function, function_name, args):
     if not args:
         return function_name, None
     arg_definitions = (' = {0};\n' + ' ' * 4).join([
-        arg.replace('*', '') for arg in args]) + ' = {0};'
+        arg.replace('*', '').replace('const', '') for arg in args]) + ' = {0};'
     arg_call = (',\n' + ' ' * 8).join([
         arg.replace('*', '&').split()[-1] for arg in args])
     fill_fuzz_args = (',\n' + ' ' * 8).join([
