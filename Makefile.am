@@ -16,6 +16,7 @@ EXTRA_DIST =
 CLEANFILES =
 MOSTLYCLEANFILES =
 noinst_PROGRAMS =
+tss2_HEADERS =
 
 ### Add ax_* rules ###
 # ax_code_coverage
@@ -150,6 +151,9 @@ include src_vars.mk
 # Add test definitions
 include Makefile-test.am
 
+# Add fuzz definitions
+include Makefile-fuzz.am
+
 ### Distribution files ###
 # Add udev rule
 udevrules_DATA   = dist/tpm-udev.rules
@@ -183,7 +187,7 @@ CLEANFILES += $(nodist_pkgconfig_DATA)
 
 # Base TSS2 headers
 tss2dir = $(includedir)/tss2
-tss2_HEADERS = \
+tss2_HEADERS += \
     $(srcdir)/include/tss2/tss2_common.h \
     $(srcdir)/include/tss2/tss2_tcti.h \
     $(srcdir)/include/tss2/tss2_tpm2_types.h

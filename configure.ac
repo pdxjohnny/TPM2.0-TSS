@@ -10,7 +10,8 @@ AC_INIT([tpm2-tss],
         [https://github.com/tpm2-software/tpm2-tss])
 AC_CONFIG_MACRO_DIR([m4])
 : ${CFLAGS=""}
-AC_PROG_CC
+AC_PROG_CXX([clang++ g++])
+AC_PROG_CC([clang gcc])
 LT_INIT()
 AM_INIT_AUTOMAKE([foreign
                   subdir-objects])
@@ -136,6 +137,8 @@ AC_ARG_ENABLE([tcti-device],
             [enable_tcti_device=$enableval],
             [enable_tcti_device=yes])
 AM_CONDITIONAL([ENABLE_TCTI_DEVICE], [test "x$enable_tcti_device" != xno])
+AM_COND_IF([ENABLE_TCTI_DEVICE], [AC_DEFINE([HAVE_TCTI_DEVICE], [1],
+           [Define if building tcti-device module.])], [])
 
 AC_ARG_ENABLE([tcti-mssim],
             [AS_HELP_STRING([--enable-tcti-mssim],
@@ -143,6 +146,17 @@ AC_ARG_ENABLE([tcti-mssim],
             [enable_tcti_mssim=$enableval],
             [enable_tcti_mssim=yes])
 AM_CONDITIONAL([ENABLE_TCTI_MSSIM], [test "x$enable_tcti_mssim" != xno])
+AM_COND_IF([ENABLE_TCTI_MSSIM], [AC_DEFINE([HAVE_TCTI_MSSIM], [1],
+           [Define if building tcti-mssim module.])], [])
+
+AC_ARG_ENABLE([tcti-fuzzing],
+            [AS_HELP_STRING([--enable-tcti-fuzzing],
+                            [build the tcti-fuzzing module (default is no)])],
+            [enable_tcti_fuzzing=$enableval],
+            [enable_tcti_fuzzing=no])
+AM_CONDITIONAL([ENABLE_TCTI_FUZZING], [test "x$enable_tcti_fuzzing" != xno])
+AM_COND_IF([ENABLE_TCTI_FUZZING], [AC_DEFINE([HAVE_TCTI_FUZZING], [1],
+           [Define if building tcti-fuzzing module.])], [])
 
 #
 # udev
@@ -190,6 +204,29 @@ AS_IF([test "x$enable_integration" = "xyes"],
               AC_MSG_ERROR([Integration tests can not be enabled without the TCTI_MSSIM module]))
        AC_SUBST([ENABLE_INTEGRATION], [$enable_integration])])
 AM_CONDITIONAL([ENABLE_INTEGRATION],[test "x$enable_integration" = "xyes"])
+#
+# fuzz testing
+#
+AC_ARG_WITH([fuzzing],
+            [AS_HELP_STRING([--with-fuzzing={none,libfuzzer,ossfuzz}],
+                            [fuzzing to build with (default is none)])],
+            [],
+            [with_fuzzing=none])
+AS_CASE(["x$with_fuzzing"],
+        ["xnone"],
+        [],
+        ["xlibfuzzer"],
+        [ADD_FUZZING_FLAG([-fsanitize=fuzzer])],
+        ["xossfuzz"],
+        [AS_IF([test "x$LIB_FUZZING_ENGINE" = "x"],
+               AC_MSG_ERROR([OSS Fuzz testing requires LIB_FUZZING_ENGINE environment variable be set]))
+         ADD_FUZZING_FLAG([-lFuzzingEngine])],
+        [AC_MSG_ERROR([Bad value for --with-fuzzing])])
+AM_CONDITIONAL([ENABLE_FUZZING],[test "x$with_fuzzing" != "xnone"])
+AM_COND_IF([ENABLE_FUZZING],
+           [ADD_COMPILER_FLAG([-fsanitize=fuzzer-no-link])
+            AS_IF([test "x$enable_tcti_fuzzng" = "xno"],
+                 AC_MSG_ERROR([Fuzz tests can not be enabled without the TCTI_FUZZING module]))])
 
 gl_LD_VERSION_SCRIPT
 
@@ -317,7 +354,8 @@ AC_OUTPUT
 
 AM_COND_IF([ENABLE_TCTI_DEVICE], [],
            [AM_COND_IF([ENABLE_TCTI_MSSIM], [],
-                       [AC_MSG_WARN("No build-in TCTI module enabled")])])
+                       [AM_COND_IF([ENABLE_TCTI_FUZZING], [],
+                                   [AC_MSG_WARN("No build-in TCTI module enabled")])])])
 
 AC_MSG_RESULT([
     $PACKAGE_NAME $VERSION
@@ -325,6 +363,7 @@ AC_MSG_RESULT([
     tctidefaultmodule:  $with_tctidefaultmodule
     tctidefaultconfig:  $with_tctidefaultconfig
     unit:               $enable_unit
+    fuzzing:            $with_fuzzing
     debug:              $enable_debug
     maxloglevel:        $with_maxloglevel
     doxygen:            $DX_FLAG_doc $enable_doxygen_doc

@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS base
 RUN apt-get update && apt-get install -y \
     autoconf \
     autoconf-archive \
@@ -46,11 +46,29 @@ RUN apt-get install -y \
     libgcrypt20-dev \
     libtool \
     liburiparser-dev \
-    uthash-dev
+    uthash-dev \
+    python3 \
+    clang
 
-# TPM2-TSS
+# TPM Fuzzing
 COPY . /tmp/tpm2-tss/
 WORKDIR /tmp/tpm2-tss
+
+## Fuzzing
+FROM base AS fuzzing
+RUN ./bootstrap -I /usr/share/gnulib/m4 \
+  && ./configure \
+     --enable-debug \
+     --with-fuzzing=libfuzzer \
+     --enable-tcti-fuzzing \
+     --enable-tcti-device=no \
+     --enable-tcti-mssim=no \
+     --disable-shared \
+  && make -j $(nproc) check
+RUN cat test-suite.log
+
+# TPM2-TSS
+FROM base
 RUN ./bootstrap -I /usr/share/gnulib/m4 \
 	&& ./configure --enable-unit \
 	&& make -j$(nproc) check \

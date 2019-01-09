@@ -117,6 +117,15 @@ script:
     else
       make -j$(nproc) check
     fi
+# check fuzz targets
+  - |
+    if [ "$CC" == "clang" ]; then
+      ../configure --enable-tcti-partial-reads=$WITH_TCTI_PARTIAL --enable-tcti-device-async=$WITH_TCTI_ASYNC --with-fuzzing=libfuzzer --enable-tcti-fuzzing --enable-tcti-device=no --enable-tcti-mssim=no --disable-shared --with-crypto=$WITH_CRYPTO $CONFIGURE_OPTIONS CFLAGS=-I${PWD}/../osslinstall/usr/local/include LDFLAGS=-L${PWD}/../osslinstall/usr/local/lib
+    fi
+  - |
+    if [ "$CC" == "clang" ]; then
+      make -j$(nproc) check
+    fi
   - |
   - popd
 # make distcheck
