@@ -55,7 +55,7 @@ WORKDIR /tmp/tpm2-tss
 
 # Fuzzing
 FROM base AS fuzzing
-RUN ./bootstrap -I /usr/share/gnulib/m4 \
+RUN GEN_FUZZ=1 ./bootstrap -I /usr/share/gnulib/m4 \
   && ./configure \
      CC=clang \
      CXX=clang++ \
