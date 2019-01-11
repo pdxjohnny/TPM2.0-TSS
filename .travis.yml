@@ -13,6 +13,7 @@ env:
   - WITH_TCTI_ASYNC=yes WITH_TCTI_PARTIAL=yes WITH_CRYPTO=ossl OPENSSL_BRANCH=OpenSSL_1_0_2-stable
   - WITH_TCTI_ASYNC=yes WITH_TCTI_PARTIAL=no WITH_CRYPTO=ossl OPENSSL_BRANCH=OpenSSL_1_0_2-stable
   - WITH_TCTI_ASYNC=no WITH_TCTI_PARTIAL=yes WITH_CRYPTO=ossl OPENSSL_BRANCH=OpenSSL_1_0_2-stable
+  - FUZZING=1 WITH_CRYPTO=ossl OPENSSL_BRANCH=OpenSSL_1_0_2-stable
   global:
   # COVERITY_SCAN_TOKEN
   - secure: "ZD0KxBhO/CaSE/TOkW+H5nsBbaMolbIPv5DgctcjA1BlTckgc5lK4m+7BIR1Fft6gaeeLOoCY3qUm4kW++Bqk2bTsrx/HvrmVmrzMO572jA74x4E+5lynUnRVaAgBg7cVBcB0hZcUurx8FifNBbgnWlxT/nDWttVnglkz400GCE9/zy+VTJWqt4QAB+6qeKPiG3vRthQdWcHstBI8IIAbvp4rhSUajBBQeZ5ro5RPGNy+iHen+t6tyJmbjiP0Y4qjkKGbfwXHnsseEcuSJQuxSkQ9MWK6t93BFXFSPw5MjHIApMn+4CjRp2JMoVTVfe5fFeZEHxVUmAzy+e5eIeftrUtUlCI293UuxZnw/vpJczn3BWunlhhjqjsCwVeknzGHxlaT+ck8Et1Mdl/3nY/E9dt47/NOzXY2xrAz59GYsdKvvsPoCGgNlAub03Vl0W24I1kjppsmN/zFwazHGqoxIBTwrDOQUmZvPfXA3jAUozrfAdT3YjnRcCG7bbQmacFApqfUm/bqMgapAgozjjxpuBrO1wQSUjjH6NANZsP2Gpk0eAl7FOlBzbVgKPxCQozWCjpKOj3HMnXX458ZQWsboG5J00wwjw9DRNRCkeexLdi832L/BPhUY5JgRlTqqyKr9cr69DvogBF/pLytpSCciF6t9NqqGZYbBomXJLaG84="
@@ -119,11 +120,11 @@ script:
     fi
 # check fuzz targets
   - |
-    if [ "$CC" == "clang" ]; then
+    if [ "$CC" == "clang" ] && [ "x$FUZZING" == "x1" ]; then
       ../configure --enable-tcti-partial-reads=$WITH_TCTI_PARTIAL --enable-tcti-device-async=$WITH_TCTI_ASYNC --with-fuzzing=libfuzzer --enable-tcti-fuzzing --enable-tcti-device=no --enable-tcti-mssim=no --disable-shared --with-crypto=$WITH_CRYPTO $CONFIGURE_OPTIONS CFLAGS=-I${PWD}/../osslinstall/usr/local/include LDFLAGS=-L${PWD}/../osslinstall/usr/local/lib
     fi
   - |
-    if [ "$CC" == "clang" ]; then
+    if [ "$CC" == "clang" ] && [ "x$FUZZING" == "x1" ]; then
       make -j$(nproc) check
     fi
   - |

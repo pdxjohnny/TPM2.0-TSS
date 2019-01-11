@@ -12,10 +12,6 @@
 extern "C" {
 #endif
 
-TSS2_RC tcti_platform_command(
-    TSS2_TCTI_CONTEXT *tcti_ctx,
-    UINT32 cmd);
-
 TSS2_RC Tss2_Tcti_Fuzzing_Init (
     TSS2_TCTI_CONTEXT *tcti_ctx,
     size_t *size,

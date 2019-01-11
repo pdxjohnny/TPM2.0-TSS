@@ -9,13 +9,9 @@ INCLUDE_DIRS += -I$(srcdir)/test/fuzz/tcti
 # tcti library used for fuzzing
 if ENABLE_TCTI_FUZZING
 libtss2_tcti_fuzzing = test/fuzz/tcti/libtss2-tcti-fuzzing.la
-tss2_HEADERS += $(srcdir)/test/fuzz/tcti/tss2_tcti_fuzzing.h
 noinst_LTLIBRARIES += $(libtss2_tcti_fuzzing)
 
 test_fuzz_tcti_libtss2_tcti_fuzzing_la_CFLAGS   = $(AM_CFLAGS)
-if HAVE_LD_VERSION_SCRIPT
-test_fuzz_tcti_libtss2_tcti_fuzzing_la_LDFLAGS  = -Wl,--version-script=$(srcdir)/test/fuzz/tcti/tss2-tcti-fuzzing.map
-endif # HAVE_LD_VERSION_SCRIPT
 test_fuzz_tcti_libtss2_tcti_fuzzing_la_LIBADD   = $(libtss2_mu) $(libutil)
 test_fuzz_tcti_libtss2_tcti_fuzzing_la_SOURCES  = \
     src/tss2-tcti/tcti-common.c src/tss2-tcti/tcti-common.h \

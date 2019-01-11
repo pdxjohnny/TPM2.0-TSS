@@ -16,7 +16,6 @@ EXTRA_DIST =
 CLEANFILES =
 MOSTLYCLEANFILES =
 noinst_PROGRAMS =
-tss2_HEADERS =
 
 ### Add ax_* rules ###
 # ax_code_coverage
@@ -187,7 +186,7 @@ CLEANFILES += $(nodist_pkgconfig_DATA)
 
 # Base TSS2 headers
 tss2dir = $(includedir)/tss2
-tss2_HEADERS += \
+tss2_HEADERS = \
     $(srcdir)/include/tss2/tss2_common.h \
     $(srcdir)/include/tss2/tss2_tcti.h \
     $(srcdir)/include/tss2/tss2_tpm2_types.h

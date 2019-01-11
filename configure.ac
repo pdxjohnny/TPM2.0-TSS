@@ -10,8 +10,8 @@ AC_INIT([tpm2-tss],
         [https://github.com/tpm2-software/tpm2-tss])
 AC_CONFIG_MACRO_DIR([m4])
 : ${CFLAGS=""}
-AC_PROG_CXX([clang++ g++])
-AC_PROG_CC([clang gcc])
+AC_PROG_CXX
+AC_PROG_CC
 LT_INIT()
 AM_INIT_AUTOMAKE([foreign
                   subdir-objects])
@@ -137,8 +137,9 @@ AC_ARG_ENABLE([tcti-device],
             [enable_tcti_device=$enableval],
             [enable_tcti_device=yes])
 AM_CONDITIONAL([ENABLE_TCTI_DEVICE], [test "x$enable_tcti_device" != xno])
-AM_COND_IF([ENABLE_TCTI_DEVICE], [AC_DEFINE([HAVE_TCTI_DEVICE], [1],
-           [Define if building tcti-device module.])], [])
+AS_IF([test "x$enable_tcti_device" != xno],
+      [AC_DEFINE([HAVE_TCTI_DEVICE], [1],
+                 [Define if building tcti-device module.])], [])
 
 AC_ARG_ENABLE([tcti-mssim],
             [AS_HELP_STRING([--enable-tcti-mssim],
@@ -146,8 +147,9 @@ AC_ARG_ENABLE([tcti-mssim],
             [enable_tcti_mssim=$enableval],
             [enable_tcti_mssim=yes])
 AM_CONDITIONAL([ENABLE_TCTI_MSSIM], [test "x$enable_tcti_mssim" != xno])
-AM_COND_IF([ENABLE_TCTI_MSSIM], [AC_DEFINE([HAVE_TCTI_MSSIM], [1],
-           [Define if building tcti-mssim module.])], [])
+AS_IF([test "x$enable_tcti_mssim" != xno],
+      [AC_DEFINE([HAVE_TCTI_MSSIM], [1],
+                 [Define if building tcti-mssim module.])], [])
 
 AC_ARG_ENABLE([tcti-fuzzing],
             [AS_HELP_STRING([--enable-tcti-fuzzing],
@@ -155,8 +157,9 @@ AC_ARG_ENABLE([tcti-fuzzing],
             [enable_tcti_fuzzing=$enableval],
             [enable_tcti_fuzzing=no])
 AM_CONDITIONAL([ENABLE_TCTI_FUZZING], [test "x$enable_tcti_fuzzing" != xno])
-AM_COND_IF([ENABLE_TCTI_FUZZING], [AC_DEFINE([HAVE_TCTI_FUZZING], [1],
-           [Define if building tcti-fuzzing module.])], [])
+AS_IF([test "x$enable_tcti_fuzzing" != xno],
+      [AC_DEFINE([HAVE_TCTI_FUZZING], [1],
+                 [Define if building tcti-fuzzing module.])], [])
 
 #
 # udev
@@ -223,10 +226,10 @@ AS_CASE(["x$with_fuzzing"],
          ADD_FUZZING_FLAG([-lFuzzingEngine])],
         [AC_MSG_ERROR([Bad value for --with-fuzzing])])
 AM_CONDITIONAL([ENABLE_FUZZING],[test "x$with_fuzzing" != "xnone"])
-AM_COND_IF([ENABLE_FUZZING],
-           [ADD_COMPILER_FLAG([-fsanitize=fuzzer-no-link])
-            AS_IF([test "x$enable_tcti_fuzzng" = "xno"],
-                 AC_MSG_ERROR([Fuzz tests can not be enabled without the TCTI_FUZZING module]))])
+AS_IF([test "x$with_fuzzing" != "xnone"],
+      [ADD_COMPILER_FLAG([-fsanitize=fuzzer-no-link], [required])
+       AS_IF([test "x$enable_tcti_fuzzng" = "xno"],
+             AC_MSG_ERROR([Fuzz tests can not be enabled without the TCTI_FUZZING module]))])
 
 gl_LD_VERSION_SCRIPT
 

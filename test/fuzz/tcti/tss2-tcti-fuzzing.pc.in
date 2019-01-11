@@ -1,7 +1,0 @@
-Name: tss2-tcti-fuzzing
-Description: TCTI library for fuzzing the System API.
-URL: https://github.com/tpm2-software/tpm2-tss
-Version: @VERSION@
-Requires: tss2-mu
-Cflags: -I@includedir@
-Libs: -ltss2-tcti-fuzzing -L@libdir@

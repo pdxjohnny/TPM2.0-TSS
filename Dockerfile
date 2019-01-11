@@ -50,14 +50,15 @@ RUN apt-get install -y \
     python3 \
     clang
 
-# TPM Fuzzing
 COPY . /tmp/tpm2-tss/
 WORKDIR /tmp/tpm2-tss
 
-## Fuzzing
+# Fuzzing
 FROM base AS fuzzing
 RUN ./bootstrap -I /usr/share/gnulib/m4 \
   && ./configure \
+     CC=clang \
+     CXX=clang++ \
      --enable-debug \
      --with-fuzzing=libfuzzer \
      --enable-tcti-fuzzing \
