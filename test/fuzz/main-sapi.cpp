@@ -30,8 +30,9 @@ LLVMFuzzerTestOneInput (
     _TSS2_SYS_CONTEXT_BLOB *ctx = NULL;
     TSS2_TCTI_FUZZING_CONTEXT *tcti_fuzzing = NULL;
 
+    /* Use the fuzzing tcti */
     test_opts_t opts = {
-        .tcti_type      = TCTI_DEFAULT,
+        .tcti_type      = FUZZING_TCTI,
         .device_file    = DEVICE_PATH_DEFAULT,
         .socket_address = HOSTNAME_DEFAULT,
         .socket_port    = PORT_DEFAULT,
@@ -42,8 +43,7 @@ LLVMFuzzerTestOneInput (
         LOG_ERROR("Checking test options");
         exit(1); /* fatal error */
     }
-    /* Use the fuzzing tcti */
-    opts.tcti_type = FUZZING_TCTI;
+
     sapi_context = sapi_init_from_opts (&opts);
     if (sapi_context == NULL) {
         LOG_ERROR("SAPI context not initialized");
