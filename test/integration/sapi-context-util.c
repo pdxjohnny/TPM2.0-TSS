@@ -12,7 +12,9 @@
 
 #include "tss2_tcti_device.h"
 #include "tss2_tcti_mssim.h"
+#ifdef HAVE_TCTI_FUZZING
 #include "tss2_tcti_fuzzing.h"
+#endif /* HAVE_TCTI_FUZZING */
 
 #include "context-util.h"
 #include "tss2-tcti/tcti-mssim.h"
