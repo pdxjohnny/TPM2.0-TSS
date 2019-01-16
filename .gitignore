@@ -78,3 +78,7 @@ test/helper/tpm_startup
 test/helper/tpm_transientempty
 Doxyfile
 doc/rtf
+
+# ignore fuzzing files
+Makefile-fuzz-generated.am
+test/fuzz/*.fuzz*
