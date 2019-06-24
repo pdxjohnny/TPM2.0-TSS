@@ -22,6 +22,7 @@ env:
   - coverity_scan_run_condition='"$CC" = gcc'
   - LD_LIBRARY_PATH="$(pwd)/osslinstall/usr/local/lib:/usr/lib"
   - PATH="$(pwd)/ibmtpm/src:${PATH}"
+  - PYTHON=python3
 
 addons:
   apt:
@@ -35,6 +36,7 @@ addons:
     - lcov
     - libssl-dev
     - gnulib
+    - python3
   coverity_scan:
     project:
       name: "01org/TPM2.0-TSS"
