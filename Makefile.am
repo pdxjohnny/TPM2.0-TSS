@@ -19,11 +19,12 @@ DISTCLEANFILES =
 CLEANFILES =
 MOSTLYCLEANFILES =
 noinst_PROGRAMS =
+BUILT_SOURCES =
 MAINTAINERCLEANFILES = \
     $(DIST_ARCHIVES) \
     AUTHORS
 
-GITIGNOREFILES = \
+GITIGNOREFILES += \
     $(GITIGNORE_MAINTAINERCLEANFILES_TOPLEVEL) \
     $(GITIGNORE_MAINTAINERCLEANFILES_MAKEFILE_IN) \
     $(GITIGNORE_MAINTAINERCLEANFILES_M4_LIBTOOL) \
@@ -46,7 +47,9 @@ GITIGNOREFILES = \
     m4/ax_normalize_path.m4 \
     m4/ax_prog_doxygen.m4 \
     m4/ax_valgrind_check.m4 \
-    m4/pkg.m4
+    m4/pkg.m4 \
+    bindings/python/pytpm2tss/__pycache__/ \
+    py-compile
 
 ### Add ax_* rules ###
 # ax_code_coverage
@@ -337,6 +340,35 @@ EXTRA_DIST += lib/tss2-esys.map \
               src/tss2-esys/tss2-esys.vcxproj \
               src/tss2-esys/tss2-esys.vcxproj.filters
 endif #ESAPI
+
+### Python bindings ###
+if PYTPM2TSS
+pytpm2tssdir = $(pythondir)/pytpm2tss
+
+pytpm2tss_PYTHON = \
+    bindings/python/pytpm2tss/__init__.py \
+    bindings/python/pytpm2tss/_libesys.cpython-36m-x86_64-linux-gnu.so
+
+bindings/python/pytpm2tss/_libesys.cpython-36m-x86_64-linux-gnu.so: bindings/python/pytpm2tss/libesys_build.py
+	$(AM_V_GEN)(cd bindings/python; $(PYTHON) pytpm2tss/libesys_build.py)
+
+bindings/python/pytpm2tss/libesys.h: bindings/python/pytpm2tss/prepare-headers.py
+	$(AM_V_GEN)($< $(top_srcdir)/include $@)
+
+BUILT_SOURCES += \
+    bindings/python/pytpm2tss/libesys.h \
+    bindings/python/pytpm2tss/_libesys.cpython-36m-x86_64-linux-gnu.so
+
+CLEANFILES += \
+    bindings/python/pytpm2tss/libesys.h \
+    bindings/python/pytpm2tss/_libesys.c \
+    bindings/python/pytpm2tss/_libesys.cpython-36m-x86_64-linux-gnu.so
+
+EXTRA_DIST += \
+    bindings/python/pytpm2tss/prepare-headers.py \
+    bindings/python/pytpm2tss/libesys_build.py
+
+endif #PYTPM2TSS
 
 ### Man Pages
 man3_MANS = man/man3/Tss2_Tcti_Device_Init.3 man/man3/Tss2_Tcti_Mssim_Init.3 $(DOXYMAN3)
